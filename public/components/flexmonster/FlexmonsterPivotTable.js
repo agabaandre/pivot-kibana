@@ -21,6 +21,7 @@ class PivotTable extends React.Component {
   constructor(props) {
     super(props);
   }
+
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.report !== this.props.report
       || prevProps.report.dataSource !== this.props.report.dataSource
@@ -32,6 +33,7 @@ class PivotTable extends React.Component {
       }
     }
   }
+
   render() {
     return (
       <div>
@@ -60,18 +62,21 @@ export class FlexmonsterPivotTable extends React.Component {
       v: true,
       format: "json"
     }, (r, q) => {
-      var indices = angular.fromJson(q).map(item => { return { label: item.index } }).filter(item => item.label.indexOf(".kibana") < 0 && item.label.indexOf(".security") < 0);
+      // Use JSON.parse instead of angular.fromJson
+      var indices = JSON.parse(q).map(item => { return { label: item.index } })
+        .filter(item => item.label.indexOf(".kibana") < 0 && item.label.indexOf(".security") < 0);
       this.setState({
         options: indices,
         isLoading: false
       });
     });
   }
+
   onChange = (selectedOptions) => {
     var report = {
       "dataSource": {
         "dataSourceType": "elasticsearch",
-        "connection": this.esClient,
+        "connection": this.esClient,  // Ensure ES 8.53 connection format
         "index": selectedOptions[0].label
       }
     };
